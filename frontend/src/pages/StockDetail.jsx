@@ -44,6 +44,11 @@ ChartJS.register(
 
 const Candlestick = (props) => <Chart type="candlestick" {...props} />;
 
+const toNumber = (value) => {
+  const n = Number(value);
+  return Number.isFinite(n) ? n : null;
+};
+
 // Background image
 import backgroundImage from '../public/stocks-6.jpg';
 
@@ -70,17 +75,29 @@ const StockDetail = () => {
     if (!data?.data) return { datasets: [] };
 
     const last60 = data.data.slice(-60);
+    const candles = last60
+      .map((row) => {
+        const x = new Date(row.Date ?? row.date ?? row.index ?? row.timestamp);
+        const o = toNumber(row.Open ?? row.open ?? row.o);
+        const h = toNumber(row.High ?? row.high ?? row.h);
+        const l = toNumber(row.Low ?? row.low ?? row.l);
+        const c = toNumber(row.Close ?? row.close ?? row.c);
+
+        if (Number.isNaN(x.getTime()) || o === null || h === null || l === null || c === null) {
+          return null;
+        }
+
+        return { x, o, h, l, c };
+      })
+      .filter(Boolean);
+
+    if (!candles.length) return { datasets: [] };
+
     return {
       datasets: [
         {
           label: 'Candlestick Chart',
-          data: last60.map((row) => ({
-            x: new Date(row.date),
-            o: row.Open,
-            h: row.High,
-            l: row.Low,
-            c: row.Close,
-          })),
+          data: candles,
           borderColor: 'rgba(0, 201, 255, 1)',
           upColor: '#00e676',
           downColor: '#ff1744',
@@ -293,7 +310,7 @@ const StockDetail = () => {
                           sx={{ '&:nth-of-type(odd)': { backgroundColor: 'rgba(255,255,255,0.05)' } }}
                         >
                           <TableCell sx={{ color: '#e0f7fa', whiteSpace: 'nowrap' }}>
-                            {new Date(row.date).toLocaleDateString()}
+                            {new Date(row.Date ?? row.date ?? row.index ?? row.timestamp).toLocaleDateString()}
                           </TableCell>
                           <TableCell sx={{ color: '#e0f7fa', whiteSpace: 'nowrap' }}>{row.Open}</TableCell>
                           <TableCell sx={{ color: '#e0f7fa', whiteSpace: 'nowrap' }}>{row.High}</TableCell>
