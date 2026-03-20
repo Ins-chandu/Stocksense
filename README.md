@@ -213,7 +213,6 @@ http://127.0.0.1:8000/docs
 
 ## 📬 Contact
 
-📧 yaswanthkalla4444@gmail.com
+📧 shekhar2772005@gmail.com
 
-🔗 [LinkedIn](https://www.linkedin.com/in/yaswanth-kalla-85534626b)
 
